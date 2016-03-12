@@ -28,7 +28,7 @@ def Count_Update(company):
 	count = query_collection.find({'time': {'$gte': str(start), '$lt': str(end)}}).count()
 	record={"company":company,"count":count,"date":datetime.now(),"score":None}
 	result=update_collection.insert_one(record)
-	print result.inserted_id
+	#print result.inserted_id
 
 
 Count_Update("amazon")
