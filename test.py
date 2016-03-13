@@ -2,6 +2,9 @@ import pandas as pd
 import datetime 
 from senti_classifier import senti_classifier
 
+#sample the tweets 1/sample
+sample=100
+
 
 def read(a):
     tweet=pd.read_csv(a)
@@ -29,6 +32,6 @@ def sentiment_score(dataset,sample):
 
 tweet=read("tweet.csv")
 sub=tweet.loc['2016-02-26']
-pos_score,neg_score=sentiment_score(sub['text'],100)
+pos_score,neg_score=sentiment_score(sub['text'],sample)
 print pos_score,neg_score
 
