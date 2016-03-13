@@ -2,38 +2,33 @@ import pandas as pd
 import datetime 
 from senti_classifier import senti_classifier
 
-'''
-sentences = ['The movie was the good movie', 'It was the worst acting by the actors']
 
-pos_score, neg_score = senti_classifier.polarity_scores(sentences)
-print "_____________________"
-print "pos_score: " + str(pos_score) + "neg_score" + str(neg_score)
-print "_____________________"
-'''
+def read(a):
+    tweet=pd.read_csv(a)
+    date=tweet['time']
+    text=tweet['text']
+    day=pd.to_datetime(date,format='%Y-%m-%d %H:%M:%S.%f')
+    day=day.map(lambda x: x.strftime('%Y-%m-%d'))
+    text = map(lambda x: [x], text)
+    tweet=pd.DataFrame(text,index=day,columns=['text'])
+    return tweet
 
-
-tweets=pd.read_csv("tweet.csv")
-
-
-
-#for i in xrange(0,len(tweets["time"])):
-for i in xrange(0,10000):
-
-	print i
-	tweets["time"][i] = datetime.datetime.strptime(tweets["time"][i], "%Y-%m-%d %H:%M:%S.%f").date()
-
-
-sub=tweets.loc[tweets['time']==datetime.date(2016, 2, 15)]
-print sub['text']
-
+def sentiment_score(dataset,sample):
+	count=pos_sum=neg_sum=0
+	for sentence in dataset:
+		if count%sample==0:
+			pos_score, neg_score = senti_classifier.polarity_scores([sentence])
+			print "pos_score: " + str(pos_score) + "  neg_score" + str(neg_score)
+			pos_sum+=pos_score
+			neg_sum+=neg_score
+		count+=1
+	pos_score,neg_score=pos_sum/(pos_sum+neg_sum),neg_sum/(pos_sum+neg_sum)	
+	return pos_score,neg_score
 
 
 
-for i in xrange(0,100):
-	sentences = sub['text'][i]
-	#print sentences
-	pos_score, neg_score = senti_classifier.polarity_scores([sentences])
-	print "pos_score: " + str(pos_score) + "  neg_score" + str(neg_score)
-	
+tweet=read("tweet.csv")
+sub=tweet.loc['2016-02-26']
+pos_score,neg_score=sentiment_score(sub['text'],100)
+print pos_score,neg_score
 
-print sub[0]
