@@ -1,9 +1,23 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+
 import pandas as pd
 import datetime 
 from senti_classifier import senti_classifier
 
+import json
+from datetime import datetime,timedelta
+from pymongo import MongoClient
+import pandas as pd
+import datetime 
+from senti_classifier import senti_classifier
+import time
+import os
+
+
 #sample the tweets 1/sample
-sample=100
+sample=5
 
 
 def read(a):
@@ -29,9 +43,36 @@ def sentiment_score(dataset,sample):
 	return pos_score,neg_score
 
 
+def query_format(company):
+	query="mongoexport -h 162.243.122.37:27017 -d tinyjumbo -c "\
+			 +company+ " --type=csv --fields time,text -q '{ \"time\": { $gt: \"2016-03\", $lt: \"2016-03-13 24:00\" } }' --out "\
+			 +company+".csv"
+	return query
 
-tweet=read("tweet.csv")
-sub=tweet.loc['2016-02-26']
+#save daily tweets
+google_query=query_format("google")
+
+os.system(google_query)
+time.sleep(3)
+
+tweet=read("google.csv")
+sub=tweet.loc[str(datetime.datetime.now().date())]
 pos_score,neg_score=sentiment_score(sub['text'],sample)
 print pos_score,neg_score
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
