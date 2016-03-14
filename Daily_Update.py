@@ -22,6 +22,7 @@ client = MongoClient('mongodb://162.243.122.37:27017/')
 
 #sample the tweets 1/sample
 sample=100
+timeslot=10
 
 
 
@@ -65,7 +66,7 @@ def query_and_process(company):
 			 +company+ " --type=csv --fields time,text -q '{ \"time\": { $gt: \"2016-03\", $lt: \"2016-03-13 24:00\" } }' --out "\
 			 +company+".csv"
 	os.system(query)
-	time.sleep(10)
+	time.sleep(timeslot)
 	tweet=read(company+".csv")
 	sub=tweet.loc[str(datetime.datetime.now().date())]
 	score=sentiment_score(sub['text'],sample)
