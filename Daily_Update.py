@@ -86,18 +86,3 @@ query_and_process("facebook")
 
 print "finished"
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
