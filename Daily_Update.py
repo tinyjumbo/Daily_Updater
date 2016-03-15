@@ -47,7 +47,7 @@ def read(a):
     return tweet
 
 #caculate score by using senti_classifier
-def sentiment_score(dataset,sample):
+def sentiment_score(dataset, sample):
 	count = pos_sum = neg_sum = 0
 	for sentence in dataset:
 		if count%sample==0:
@@ -57,7 +57,7 @@ def sentiment_score(dataset,sample):
 			neg_sum += neg_score
 		count += 1
 	pos_score,neg_score = pos_sum/(pos_sum + neg_sum),neg_sum/(pos_sum + neg_sum)	
-	return pos_score-neg_score
+	return pos_score - neg_score
 
 #mian function
 def query_and_process(company):
