@@ -43,7 +43,7 @@ def read(a):
     day = pd.to_datetime(date,format = '%Y-%m-%d %H:%M:%S.%f')
     day = day.map(lambda x: x.strftime('%Y-%m-%d'))
     text = map(lambda x: [x], text)
-    tweet = pd.DataFrame(text, index = day, columns = s['text'])
+    tweet = pd.DataFrame(text, index = day, columns = ['text'])
     return tweet
 
 #caculate score by using senti_classifier
