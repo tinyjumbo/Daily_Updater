@@ -56,13 +56,16 @@ def sentiment_score(dataset, sample):
 			pos_sum += pos_score
 			neg_sum += neg_score
 		count += 1
-	pos_score,neg_score = pos_sum/(pos_sum + neg_sum),neg_sum/(pos_sum + neg_sum)	
+	sum_val = pos_sum + neg_sum
+	pos_score,neg_score = pos_sum/min(0.0000001,sum_val),neg_sum/min(0.0000001,sum_val)	
 	return pos_score - neg_score
 
 #mian function
 def query_and_process(company):
-	query = "mongoexport -h 162.243.122.37:27017 -d tinyjumbo -c "\
-			 + company + " --type=csv --fields time,text -q '{ \"time\": { $gt: \"2016-03\", $lt: \"2016-03-13 24:00\" } }' --out "\
+	query = "mongoexport -h 162.243.122.37:27017 -d tinyjumbo -c "
+			 + company + " --type=csv --fields time,text -q '{ \"time\": { $gt: \"" 
+			 + str(datetime.datetime.now().date()) + "\", $lt: \"" 
+			 + str(datetime.datetime.now().date()) + " 24:00\" } }' --out "
 			 + company + ".csv"
 	os.system(query)
 	time.sleep(TIMESLOT)
