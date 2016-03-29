@@ -76,7 +76,7 @@ def query_and_process(company):
     score = sentiment_score(sub['text'],SAMPLE)
     # Update DB
     Count_Update(company,score)
-    os.system("rm -f "+ company + ".csv")    
+    os.system("rm -f " + company + ".csv")    
     return
 
 
