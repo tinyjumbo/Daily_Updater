@@ -6,14 +6,16 @@ This small program is to count the number of tweets of each company
 update the number and score in tcount collection for each company
 '''
 
-import json
+from senti_classifier import senti_classifier
 from datetime import datetime,timedelta
+from nltk.corpus import stopwords
 from pymongo import MongoClient
 import pandas as pd
 import datetime 
-from senti_classifier import senti_classifier
 import time
+import json
 import os
+import re
 
 # Mongo config
 client = MongoClient()
@@ -54,7 +56,7 @@ def sentiment_score(dataset, sample):
     for sentence in dataset:
         if count%sample==0:
             pos_score, neg_score = senti_classifier.polarity_scores([sentence])
-            print "pos_score: " + str(pos_score) + "  neg_score" + str(neg_score)
+            #print "pos_score: " + str(pos_score) + "  neg_score" + str(neg_score)
             pos_sum += pos_score
             neg_sum += neg_score
         count += 1
@@ -62,6 +64,23 @@ def sentiment_score(dataset, sample):
     pos_score,neg_score = pos_sum/max(0.0000001,sum_val),neg_sum/max(0.0000001,sum_val)    
     return pos_score - neg_score
 
+# Create a loop to get the clean text
+def corpus(sub):
+    num_text=sub['text'].size
+    cleantext=[]
+    for i in xrange(0,num_text):
+        cleantext.append(words(sub['text'][i]))
+    return cleantext
+
+# Pre-process the text
+def words(text):
+    text=re.sub(r'''(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))''', \
+    '',text,flags=re.MULTILINE)
+    letters=re.sub('[^a-zA-Z]', ' ', text)
+    words=letters.lower().split()
+    stop=set(stopwords.words('english'))
+    meanfulwords=[w for w in words if not w in stop]
+    return(' '.join(meanfulwords))
 
 # Mian function
 def query_and_process(company):
@@ -72,8 +91,11 @@ def query_and_process(company):
     # Read data
     tweet = read(company + ".csv")
     sub = tweet.loc[CURRDATE]
+    # Pre-process Data
+    sub=corpus(sub) 
     # Get score
-    score = sentiment_score(sub['text'],SAMPLE)
+    score = sentiment_score(sub,SAMPLE)
+    print str(score)
     # Update DB
     Count_Update(company,score)
     os.system("rm -f " + company + ".csv")    
@@ -81,12 +103,15 @@ def query_and_process(company):
 
 
 # Save daily tweets as csv
+CURRDATE = '2016-04-03' #hardcode update date
+print "\n-----------PROCESSING-----------    "+CURRDATE
+
 names = ["google", "amazon", "facebook"]
 map(query_and_process, names)
 print "finished"
 
 ''' if want to caculate mutiple days. Use following:
-hard_code_time = '2016-03-20'
+hard_code_time = '2016-03-29'
 timearry = [hard_code_time[:-2]+str(int(hard_code_time[-2:])+i) for i in range(13) ]
 
 for t in timearry:
